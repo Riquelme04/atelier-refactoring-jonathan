@@ -23,6 +23,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- JUnit 6 (nom de projet toujours "Jupiter" pour l'API @Test/@ParameterizedTest/...) -->
         <junit.version>6.0.3</junit.version>
+        <sonar.organization>spring-petclinic-rest</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
     <dependencies>
@@ -47,10 +49,51 @@
 
             <!-- Exécute les tests unitaires (phase "test") et génère les rapports Surefire -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.5</version>
-            </plugin>
+    <groupId>org.jacoco</groupId>
+    <artifactId>jacoco-maven-plugin</artifactId>
+    <version>${maven.jacoco-plugin.version}</version>
+    <configuration>
+        <excludes>
+            <!-- Generated code -->
+            <exclude>**/org/springframework/samples/petclinic/rest/dto/**</exclude>
+            <exclude>**/org/springframework/samples/petclinic/rest/api/**</exclude>
+        </excludes>
+    </configuration>
+    <executions>
+        <execution>
+            <id>prepare-agent</id>
+            <goals><goal>prepare-agent</goal></goals>
+        </execution>
+        <execution>
+            <id>check</id>
+            <goals><goal>check</goal></goals>
+            <configuration>
+                <rules>
+                    <rule>
+                        <element>BUNDLE</element>
+                        <limits>
+                            <limit>
+                                <counter>LINE</counter>
+                                <value>COVEREDRATIO</value>
+                                <minimum>0.85</minimum>
+                            </limit>
+                            <limit>
+                                <counter>BRANCH</counter>
+                                <value>COVEREDRATIO</value>
+                                <minimum>0.66</minimum>
+                            </limit>
+                        </limits>
+                    </rule>
+                </rules>
+            </configuration>
+        </execution>
+        <execution>
+            <id>report</id>
+            <goals><goal>report</goal></goals>
+        </execution>
+    </executions>
+</plugin>
+
 
             <!-- TODO (bonus, voir README Partie 5) : ajoutez ici le plugin jacoco-maven-plugin
                  pour mesurer votre couverture de code avant/après l'ajout de vos tests de
